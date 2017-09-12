@@ -84,13 +84,17 @@ def save_ingredient(ingredient):
     if not os.path.exists(path):
         print('path : ', path)
         os.makedirs(path)
+    else:
+        existing_ingredient = get_ingredient(path=path)
+        ingredient.quantity_names = list(set(existing_ingredient.quantity_names + ingredient.quantity_names))
+        ingredient.complements = list(set(existing_ingredient.complements + ingredient.complements))
 
     filename_features = 'features'
     filename_quantity_names = 'quantity_names'
     filename_complements = 'complements'
 
     f = open(os.path.join(path, filename_features), 'w')
-    f.write(ingredient.name)
+    f.write(ingredient.name.strip())
     f.close()
 
     f = open(os.path.join(path, filename_quantity_names), 'w')
@@ -100,6 +104,40 @@ def save_ingredient(ingredient):
     f = open(os.path.join(path, filename_complements), 'w')
     f.write('\n'.join(ingredient.complements))
     f.close()
+
+
+def get_ingredient(path=None, name=None):
+
+    if path is None and name is None:
+        raise ValueError('The arguments are invalid')
+
+    if name is None:
+        try:
+            name = path.split('/')[2]
+        except:
+            raise Exception('Path is not good : ', path)
+
+    ingredient = Ingredient(name=name)
+    if not does_ingredient_exist(ingredient):
+        return None
+
+    filename_features = 'features'
+    filename_quantity_names = 'quantity_names'
+    filename_complements = 'complements'
+
+    f = open(os.path.join(path, filename_features), 'r')
+    ingredient.name = [l.replace('\n', '') for l in f][0]
+    f.close()
+
+    f = open(os.path.join(path, filename_quantity_names), 'r')
+    ingredient.quantity_names = [l.replace('\n', '') for l in f]
+    f.close()
+
+    f = open(os.path.join(path, filename_complements), 'r')
+    ingredient.complements = [l.replace('\n', '') for l in f]
+    f.close()
+
+    return ingredient
 
 
 # Ustensile

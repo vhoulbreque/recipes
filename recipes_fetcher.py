@@ -32,7 +32,7 @@ def remove_spaces(s):
         return ''
     if len(s) == 0:
         return ''
-    s = s.replace('\r', ' ').replace('\n', ' ').replace('\t', ' ')
+    s = s.replace('\r', ' ').replace('\n', ' ').replace('\t', ' ').replace('\n\xa0', ' ')
     s_new = ''
     for i in range(0, len(s) - 1):
         if not (s[i] == ' ' and s[i + 1] == ' '):
@@ -55,9 +55,29 @@ def retrieve_recipe(html, recipe=None):
         quantity = ingredient_tag.div.findAll('span')[0].get_text()
         complement = ingredient_tag.div.findAll('span')[1].get_text()
         [s.extract() for s in ingredient_tag('span')]
-        ingredient_name = ingredient_tag.get_text().replace('&nbsp;', ' ').replace('\'', '&quot;').replace('"', '&quot;')
 
-        ingredient = Ingredient(name=ingredient_name, quantity_names=[''], complements=[complement])
+        ingredient_name = ingredient_tag.get_text()
+        ingredient_name = ingredient_name.replace('&nbsp;', ' ').replace('\'', '&quot;').replace('"', '&quot;')
+        ingredient_name = remove_spaces(ingredient_name)
+
+        if ' de ' in ingredient_name or 'd&quot;' in ingredient_name:
+            index_1 = ingredient_name.find(' de ')
+            index_2 = ingredient_name.find('d&quot;')
+
+            if index_1 == -1 or (index_1 != -1 and index_2 != -1 and index_2 < index_1):
+                s = 'd&quot;'
+            else:
+                s = ' de '
+
+            t = ingredient_name.split(s)
+            quantity_name = t[0].strip()
+            ingredient_name = ' '.join(t[1:]).strip()
+
+
+        else:
+            quantity_name = ''
+
+        ingredient = Ingredient(name=ingredient_name, quantity_names=[quantity_name], complements=[complement])
 
         recipe['ingredients'].append(ingredient)
 
@@ -209,7 +229,7 @@ def rss_reader(rss_url):
                 save_recipe(recipe)
                 print('#')
         except Exception as e:
-            print('Exception : ', e)
+            print('Exception rss_reader: ', e)
 
 
 if __name__ == '__main__':
