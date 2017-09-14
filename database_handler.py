@@ -2,6 +2,7 @@ import os
 import json
 from ingredient import Recipe, Ustensile, IngredientRecipe, Ingredient
 
+
 # Recipes
 
 def does_recipe_exist(recipe):

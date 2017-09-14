@@ -1,6 +1,9 @@
 import signal
 import requests
+from urllib import request
 
+import os, sys
+from PIL import Image
 
 user_agent = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
                             'Chrome/55.0.2883.87 Safari/537.36'}
@@ -29,6 +32,13 @@ def merge_spaces(s):
         if not (s[i] == ' ' and s[i + 1] == ' '):
             s_new += s[i]
     return (s_new + s[-1]).strip()
+
+
+def get_soup(url):
+    from bs4 import BeautifulSoup
+
+    _, html = get_html(url)
+    return BeautifulSoup(html, 'lxml')
 
 
 # Retrieve the html and the url after redirection of a given url
@@ -71,3 +81,24 @@ def get_html(url, timeout_seconds=20):
         if verbose: print('Timeout after request ended: ignore it:', url)
     finally:
         signal.alarm(0)
+
+
+def download_and_save_image(url, save_path):
+    try:
+        request.urlretrieve(url, save_path)
+    except Exception as e:
+        print('could not load : ' + url)
+        print(e)
+
+
+def resize_picture(path, height, width):
+
+    size = height, width
+
+    try:
+        im = Image.open(path)
+        im.thumbnail(size, Image.ANTIALIAS)
+        im.save(path, "JPEG")
+    except IOError:
+        print("cannot create thumbnail for '%s'" % path)
+        os.remove(path)
