@@ -1,5 +1,7 @@
 import os
 import json
+import time
+from random import random
 from utils import get_html, download_and_save_image, get_soup, resize_picture
 
 
@@ -31,7 +33,10 @@ for folder_name in os.listdir('_data/ingredients'):
 
     for i, (img_url, Type) in enumerate(actual_images):
         picture_path = os.path.join(query_directory, '{}_{}.jpg'.format(folder_name, i))
+        if os.path.exists(picture_path):
+            continue
         print('picture_path : ', picture_path)
 
         download_and_save_image(img_url, picture_path)
         resize_picture(picture_path, height, width)
+        time.sleep(5 + 5 * random())
