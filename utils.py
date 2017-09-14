@@ -93,12 +93,16 @@ def download_and_save_image(url, save_path):
 
 def resize_picture(path, height, width):
 
+    if not os.path.exists(path):
+        print('The image does not exist')
+        return
+
     size = height, width
 
     try:
         im = Image.open(path)
         im.thumbnail(size, Image.ANTIALIAS)
-        im.save(path, "JPEG")
+        im.save(path, 'JPEG')
     except IOError:
-        print("cannot create thumbnail for '%s'" % path)
+        print('Cannot create thumbnail for the image at path : `{}`'.format(path))
         os.remove(path)
