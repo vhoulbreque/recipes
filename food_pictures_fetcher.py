@@ -6,6 +6,7 @@ from utils import get_html, download_and_save_image, get_soup, resize_picture
 
 
 height, width = 256, 256
+N_MAX_IMAGES = 50
 
 
 for folder_name in os.listdir('_data/ingredients'):
@@ -16,7 +17,7 @@ for folder_name in os.listdir('_data/ingredients'):
     url = 'https://www.google.co.in/search?q=' + query + '&source=lnms&tbm=isch'
     print(url)
 
-    #add the directory for your image here
+    # add the directory for your image here
     ROOT_DIRECTORY = '_data_pictures'
     soup = get_soup(url)
 
@@ -32,11 +33,17 @@ for folder_name in os.listdir('_data/ingredients'):
         os.makedirs(query_directory)
 
     for i, (img_url, Type) in enumerate(actual_images):
+
+        if i > N_MAX_IMAGES: break
         picture_path = os.path.join(query_directory, '{}_{}.jpg'.format(folder_name, i))
         if os.path.exists(picture_path):
             continue
         print('picture_path : ', picture_path)
 
-        download_and_save_image(img_url, picture_path)
-        resize_picture(picture_path, height, width)
-        time.sleep(5 + 5 * random())
+        success_save = download_and_save_image(img_url, picture_path)
+        success_resize = resize_picture(picture_path, height, width)
+
+        if success_save and success_resize:
+            sleep_time = 5 + 5 * random()
+            print('Sleeping {}'.format(sleep_time))
+            time.sleep(sleep_time)

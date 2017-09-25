@@ -84,18 +84,30 @@ def get_html(url, timeout_seconds=20):
 
 
 def download_and_save_image(url, save_path):
+
+    return_code = 1
+
+    signal.signal(signal.SIGALRM, _timeout)
+    signal.alarm(5)
+
     try:
         request.urlretrieve(url, save_path)
     except Exception as e:
         print('could not load : ' + url)
         print(e)
+        return_code = 0
+    signal.alarm(0)
+
+    return return_code
 
 
 def resize_picture(path, height, width):
 
+    return_code = 1
+
     if not os.path.exists(path):
         print('The image does not exist')
-        return
+        return 0
 
     size = height, width
 
@@ -106,3 +118,6 @@ def resize_picture(path, height, width):
     except IOError:
         print('Cannot create thumbnail for the image at path : `{}`'.format(path))
         os.remove(path)
+        return_code = 0
+
+    return return_code
