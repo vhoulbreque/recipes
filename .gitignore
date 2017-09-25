@@ -2,3 +2,5 @@ _data*
 
 *.pyc
 *.log
+
+test.py
