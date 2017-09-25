@@ -7,8 +7,13 @@ from ingredient import Recipe, Ustensile, IngredientRecipe, Ingredient
 
 def does_recipe_exist(recipe):
 
-    recipe_url_transformed = recipe.url_original_website.replace('/', '').replace('.', '').replace(':', '')[34:]
-    return os.path.isdir(os.path.join('_data/recipes/', recipe_url_transformed))
+    try:
+        recipe_url_transformed = recipe.url_original_website.replace('/', '').replace('.', '').replace(':', '')[34:]
+        return os.path.isdir(os.path.join('_data/recipes/', recipe_url_transformed))
+    except:
+        recipe_title = recipe.title
+        return os.path.isdir(os.path.join('_data/recipes/', recipe_title))
+
 
 
 def save_recipe(recipe):
@@ -109,7 +114,7 @@ def get_recipe(path=None, name=None):
     f.close()
 
     f = open(os.path.join(path, filename_steps), 'r')
-    lines = '\n'.join([l.replace('\n', '') for l in f])
+    lines = [l.replace('\n', '') for l in f]
     recipe.steps = [json.loads(l) for l in lines]
     f.close()
 
@@ -132,6 +137,23 @@ def get_recipe(path=None, name=None):
     f.close()
 
     return recipe
+
+
+def get_all_recipes():
+
+    folder_recipes = '_data/recipes/'
+
+    recipes = []
+
+    for folder in os.listdir(folder_recipes):
+        try:
+            recipe = get_recipe(path=os.path.join(folder_recipes, folder))
+            if recipe is None: continue
+            recipes.append(recipe)
+        except:
+            print('Problem with the recipe : {}'.format(folder))
+
+    return recipes
 
 
 # Ingredients
