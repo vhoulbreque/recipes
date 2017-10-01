@@ -115,6 +115,7 @@ def get_recipe(path=None, name=None):
 
     f = open(os.path.join(path, filename_steps), 'r')
     lines = [l.replace('\n', '') for l in f]
+
     recipe.steps = [json.loads(l) for l in lines]
     f.close()
 
@@ -146,12 +147,10 @@ def get_all_recipes():
     recipes = []
 
     for folder in os.listdir(folder_recipes):
-        try:
-            recipe = get_recipe(path=os.path.join(folder_recipes, folder))
-            if recipe is None: continue
-            recipes.append(recipe)
-        except:
-            print('Problem with the recipe : {}'.format(folder))
+        try
+        recipe = get_recipe(path=os.path.join(folder_recipes, folder))
+        if recipe is None: continue
+        recipes.append(recipe)
 
     return recipes
 
